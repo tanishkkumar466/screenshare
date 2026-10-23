@@ -5,5 +5,5 @@
   "identifier": "com.desklink.app",
   "build": { "frontendDist": "../../ui" },
   "app": { "withGlobalTauri": true, "windows": [{ "title": "DeskLink", "width": 1040, "height": 700, "resizable": true }] },
-  "bundle": { "active": true, "targets": "all", "icon": [] }
+  "bundle": { "active": true, "targets": "all", "icon": ["icons/icon.png", "icons/icon.ico"] }
 }
