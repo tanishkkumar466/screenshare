@@ -70,9 +70,12 @@ mod native {
     use winapi::um::winuser::{SendInput, INPUT, INPUT_KEYBOARD, INPUT_MOUSE, INPUT_u, KEYBDINPUT, MOUSEINPUT,
         KEYEVENTF_KEYUP, KEYEVENTF_SCANCODE, MOUSEEVENTF_MOVE, MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP,
         MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP, MOUSEEVENTF_MIDDLEDOWN, MOUSEEVENTF_MIDDLEUP, MOUSEEVENTF_WHEEL};
-    fn send(input: INPUT) -> Result<()> { let sent = unsafe { SendInput(1, &input, std::mem::size_of::<INPUT>() as i32) }; if sent != 1 { bail!("Windows rejected the input event"); } Ok(()) }
+    fn send(mut input: INPUT) -> Result<()> { let sent = unsafe { SendInput(1, &mut input, std::mem::size_of::<INPUT>() as i32) }; if sent != 1 { bail!("Windows rejected the input event"); } Ok(()) }
     fn mouse(dx: i32, dy: i32, flags: u32, data: u32) -> Result<()> {
-        send(INPUT { type_: INPUT_MOUSE, u: INPUT_u { mi: MOUSEINPUT { dx, dy, mouseData: data, dwFlags: flags, time: 0, dwExtraInfo: 0 } } })
+        let mut input: INPUT = unsafe { std::mem::zeroed() };
+        input.type_ = INPUT_MOUSE;
+        unsafe { *input.u.mi_mut() = MOUSEINPUT { dx, dy, mouseData: data, dwFlags: flags, time: 0, dwExtraInfo: 0 }; }
+        send(input)
     }
     pub fn inject(event: InputEvent) -> Result<()> {
         match event {
@@ -83,7 +86,10 @@ mod native {
             InputEvent::Scroll { vertical, .. } => mouse(0, 0, MOUSEEVENTF_WHEEL, vertical as i32 as u32),
             InputEvent::Key { scan_code, pressed } => {
                 let Some(code) = windows_scancode(scan_code) else { bail!("Unsupported HID key usage {scan_code}"); };
-                send(INPUT { type_: INPUT_KEYBOARD, u: INPUT_u { ki: KEYBDINPUT { wVk: 0, wScan: code, dwFlags: KEYEVENTF_SCANCODE | if pressed { 0 } else { KEYEVENTF_KEYUP }, time: 0, dwExtraInfo: 0 } } })
+                let mut input: INPUT = unsafe { std::mem::zeroed() };
+                input.type_ = INPUT_KEYBOARD;
+                unsafe { *input.u.ki_mut() = KEYBDINPUT { wVk: 0, wScan: code, dwFlags: KEYEVENTF_SCANCODE | if pressed { 0 } else { KEYEVENTF_KEYUP }, time: 0, dwExtraInfo: 0 }; }
+                send(input)
             }
         }
     }
