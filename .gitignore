@@ -1,0 +1,6 @@
+/target
+/node_modules
+/dist/**/*.app
+/dist/**/*.exe
+/dist/**/*.msi
+.DS_Store

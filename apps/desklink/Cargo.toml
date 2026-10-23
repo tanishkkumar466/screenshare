@@ -1,0 +1,24 @@
+[package]
+name = "desklink"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "desklink"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+link-core = { path = "../../crates/link-core" }
+mdns-sd = "0.16"
+serde.workspace = true
+serde_json.workspace = true
+tauri = { version = "2", features = [] }
+tokio.workspace = true
+tracing.workspace = true
+uuid.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
