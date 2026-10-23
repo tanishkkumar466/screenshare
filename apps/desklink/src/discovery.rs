@@ -5,6 +5,7 @@ use std::{sync::{Arc, Mutex}, thread};
 
 pub const SERVICE_TYPE: &str = "_desklink._udp.local.";
 pub const CONTROL_PORT: u16 = 49152;
+pub const INPUT_PORT: u16 = 49153;
 
 /// Advertises this DeskLink endpoint and continuously listens for peers on the LAN.
 /// mDNS stays local to the current network; it does not expose a public service.
@@ -17,7 +18,7 @@ impl Discovery {
     pub fn start(device_name: &str) -> Result<Self> {
         let daemon = ServiceDaemon::new()?;
         let instance = format!("{}-{}", device_name, &uuid::Uuid::new_v4().simple().to_string()[..8]);
-        let properties = [("version", "1"), ("control_port", "49152")];
+        let properties = [("version", "1"), ("control_port", "49152"), ("input_port", "49153")];
         let info = ServiceInfo::new(SERVICE_TYPE, &instance, "desklink.local.", "", CONTROL_PORT, &properties[..])?.enable_addr_auto();
         daemon.register(info)?;
         let receiver = daemon.browse(SERVICE_TYPE)?;

@@ -9,6 +9,9 @@ One Rust codebase, one application, two simultaneous roles: each device can send
 - Serializable multi-machine display layout and edge-crossing input routing.
 - A minimal shared UI shell for pairing, layout, and stream quality.
 - An authenticated UDP input wire format: ChaCha20-Poly1305 encryption and replay rejection. The desktop app has a strict no-plaintext UDP sender/receiver.
+- A live TCP pairing exchange using SPAKE2 plus ephemeral X25519, with a 120-second pairing code and in-memory directional session keys.
+- A local JSON trusted-peer record saved only after successful proof confirmation.
+- Paired session keys connect to encrypted UDP input on port `49153`; the UI can send a harmless test pointer-motion packet and display authenticated receipt.
 - Explicit platform traits for native screen capture and input injection.
 
 The routing unit test captures the first build-order milestone: moving past a touching screen edge moves input ownership to the adjacent machine.
@@ -32,7 +35,7 @@ cargo test -p link-core
 cargo run -p desklink
 ```
 
-The present repository is intentionally not yet a remotely controllable desktop product: the next implementation milestones are Noise/QUIC + mDNS, Windows input adapters, macOS input adapters, then capture/FFmpeg transport.
+The present repository is still not a remotely controllable desktop product: system-wide input capture/injection and screen capture/FFmpeg transport remain to be implemented.
 
 ## Security baseline before network testing
 

@@ -1,0 +1,47 @@
+name: Build DeskLink
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test -p link-core
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build native executable
+        run: cargo build --release -p desklink
+      - name: Create application bundle
+        run: |
+          mkdir -p release/DeskLink.app/Contents/MacOS
+          cp target/release/desklink release/DeskLink.app/Contents/MacOS/DeskLink
+          cp apps/desklink/icons/icon.png release/DeskLink.app/Contents/icon.png
+          cp apps/desklink/tauri.conf.json release/DeskLink.app/Contents/tauri.conf.json
+          printf '%s' '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict><key>CFBundleExecutable</key><string>DeskLink</string><key>CFBundleIdentifier</key><string>com.desklink.app</string><key>CFBundleName</key><string>DeskLink</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleVersion</key><string>1</string></dict></plist>' > release/DeskLink.app/Contents/Info.plist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DeskLink-macOS
+          path: release/DeskLink.app
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build Windows executable
+        run: cargo build --release -p desklink
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DeskLink-Windows
+          path: target/release/desklink.exe

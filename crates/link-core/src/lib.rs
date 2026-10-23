@@ -6,6 +6,8 @@ pub mod layout;
 pub mod pairing;
 pub mod protocol;
 pub mod secure_input;
+pub mod session;
+pub mod pake;
 
 pub use input::{InputEvent, InputRouter, PointerMotion, Route};
 pub use layout::{Display, DisplayLayout, Edge, MachineId, Rect};

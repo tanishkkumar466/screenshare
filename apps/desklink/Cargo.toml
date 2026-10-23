@@ -11,10 +11,13 @@ path = "src/main.rs"
 [dependencies]
 anyhow.workspace = true
 async-trait.workspace = true
+blake3.workspace = true
 link-core = { path = "../../crates/link-core" }
 mdns-sd = "0.16"
+rdev = "0.5.3"
 serde.workspace = true
 serde_json.workspace = true
+subtle.workspace = true
 tauri = { version = "2", features = [] }
 tokio.workspace = true
 tracing.workspace = true
@@ -22,3 +25,6 @@ uuid.workspace = true
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+winapi = { version = "0.3", features = ["winuser"] }

@@ -3,7 +3,7 @@
 //! Session keys are supplied only after a future authenticated control-plane
 //! pairing flow. This module intentionally has no fallback plaintext mode.
 use anyhow::{bail, Result};
-use link_core::{InputOpener, InputSealer};
+use link_core::{InputEvent, InputOpener, InputSealer};
 use link_core::protocol::InputPacket;
 use std::net::{SocketAddr, ToSocketAddrs};
 use tokio::net::UdpSocket;
@@ -32,6 +32,10 @@ impl UdpInputSender {
         if datagram.len() > MAX_INPUT_DATAGRAM { bail!("input event exceeds UDP safety budget"); }
         self.socket.send_to(&datagram, self.peer).await?;
         Ok(())
+    }
+
+    pub async fn send_event(&mut self, sequence: u32, event: InputEvent) -> Result<()> {
+        self.send(&InputPacket { sequence, event }).await
     }
 }
 
